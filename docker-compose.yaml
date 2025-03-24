@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   web:
@@ -11,13 +11,15 @@ services:
       - static_volume:/Dr/staticfiles
       - media_volume:/Dr/mediafiles
     ports:
-      - "8020:8000"
+      - "8001:8000"
     depends_on:
-      - dr_db
-      - redis
+      ari_db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     restart: always
 
-  dr_db:
+  ari_db:
     image: postgres:latest
     environment:
       POSTGRES_DB: dr
@@ -28,7 +30,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user_dr -d dr"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   redis:
     image: redis:alpine
