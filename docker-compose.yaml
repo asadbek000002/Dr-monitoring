@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    env_file:
+      - .env
+    command: sh -c "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 Dr.wsgi:application"
+    volumes:
+      - .:/Dr
+      - static_volume:/Dr/staticfiles
+      - media_volume:/Dr/mediafiles
+    ports:
+      - "8020:8000"
+    depends_on:
+      - dr_db
+      - redis
+    restart: always
+
+  dr_db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: dr
+      POSTGRES_USER: user_dr
+      POSTGRES_PASSWORD: password_dr
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6371:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+  redis_data:
