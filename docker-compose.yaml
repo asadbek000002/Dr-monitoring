@@ -13,13 +13,13 @@ services:
     ports:
       - "8001:8000"
     depends_on:
-      ari_db:
+      dr_db:
         condition: service_healthy
       redis:
         condition: service_started
     restart: always
 
-  ari_db:
+  dr_db:
     image: postgres:latest
     environment:
       POSTGRES_DB: dr
