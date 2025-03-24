@@ -162,22 +162,22 @@ SIMPLE_JWT = {
 AUTH_USER_MODEL = 'employee.User'  # yourapp ni loyihangiz nomiga almashtiring
 
 # CORS Ruxsatlar
-# CORS_ALLOWED_ORIGINS = [
-#     "https://ari.uzfati.uz",
-#     "http://ari.uzfati.uz",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://dilshodakosmetolog.uz/",
+    "https://dilshodakosmetolog.uz/",
+]
 
 # Agar barcha domenlarga ruxsat berish kerak bo‘lsa:
-# CORS_ALLOW_ALL_ORIGINS = True  # Tavsiya etilmaydi
+CORS_ALLOW_ALL_ORIGINS = True  # Tavsiya etilmaydi
 
 # CORS_ALLOW_CREDENTIALS = True  # Cookie va auth tokenlarni ishlatish uchun
 
 
 # CSRF sozlamalari
-# CSRF_TRUSTED_ORIGINS = [
-#     "http://warehouse.bekzodbek-dev.uz",
-#     "https://warehouse.bekzodbek-dev.uz",
-# ]
+CSRF_TRUSTED_ORIGINS = [
+    "http://dilshodakosmetolog.uz/",
+    "https://dilshodakosmetolog.uz/",
+]
 
-# CSRF_COOKIE_SECURE = True  # HTTPS orqali xavfsiz cookie'larni ishlatish
-# CSRF_USE_SESSIONS = True  # CSRF tokenni sessiya orqali saqlash
+CSRF_COOKIE_SECURE = True  # HTTPS orqali xavfsiz cookie'larni ishlatish
+CSRF_USE_SESSIONS = True  # CSRF tokenni sessiya orqali saqlash
