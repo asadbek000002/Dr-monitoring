@@ -1,5 +1,7 @@
 from django.db import models
 from django.db.models import Sum
+from decimal import Decimal
+
 
 class Region(models.Model):
     name = models.CharField(max_length=100)
@@ -43,16 +45,17 @@ class Patient(models.Model):
     @property
     def total_paid(self):
         """Bemor tomonidan to‘langan jami summa"""
-        return self.payments.aggregate(total=Sum('amount'))['total'] or 0.00
+        total = self.payments.aggregate(total=Sum('amount'))['total']
+        return Decimal(str(total)) if total is not None else Decimal('0.00')
 
     @property
     def remaining_debt(self):
         """Bemorning qolgan qarzi (manfiy bo‘lsa ham xato chiqarmaydi)"""
-        return self.total_payment_due - self.total_paid
+        return self.total_payment_due - self.total_paid  # ✅ TypeError chiqmaydi
 
     def update_status(self):
         """Agar qarz <= 0 bo‘lsa, statusni `paid`ga o‘zgartirish"""
-        if self.remaining_debt <= 0:
+        if self.remaining_debt <= Decimal('0.00'):
             self.status = 'paid'
         else:
             self.status = 'debtor'
