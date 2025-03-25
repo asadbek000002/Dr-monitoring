@@ -163,8 +163,8 @@ AUTH_USER_MODEL = 'employee.User'  # yourapp ni loyihangiz nomiga almashtiring
 
 # CORS Ruxsatlar
 CORS_ALLOWED_ORIGINS = [
-    "http://dilshodakosmetolog.uz/",
-    "https://dilshodakosmetolog.uz/",
+    "http://dilshodakosmetolog.uz",
+    "https://dilshodakosmetolog.uz",
 ]
 
 # Agar barcha domenlarga ruxsat berish kerak bo‘lsa:
@@ -175,8 +175,8 @@ CORS_ALLOW_ALL_ORIGINS = True  # Tavsiya etilmaydi
 
 # CSRF sozlamalari
 CSRF_TRUSTED_ORIGINS = [
-    "http://dilshodakosmetolog.uz/",
-    "https://dilshodakosmetolog.uz/",
+    "http://dilshodakosmetolog.uz",
+    "https://dilshodakosmetolog.uz",
 ]
 
 CSRF_COOKIE_SECURE = True  # HTTPS orqali xavfsiz cookie'larni ishlatish
