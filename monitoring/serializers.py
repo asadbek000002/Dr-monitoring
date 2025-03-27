@@ -44,7 +44,7 @@ class PatientCreateSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'full_name', 'phone_number', 'region', 'address', 'photo',
             'type_disease', 'face_condition', 'medications_taken',
-            'home_care_items', 'status', 'appointments', 'remove', 'created_at'
+            'home_care_items', 'total_payment_due', 'status', 'appointments', 'remove', 'created_at'
         ]
 
     def create(self, validated_data):

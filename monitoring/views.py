@@ -1,14 +1,14 @@
 from collections import defaultdict
-
+from django.utils.timezone import now, timedelta
 from django.db.models import Q, Count
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, DestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from django.shortcuts import get_object_or_404
-from .models import Patient, PatientPayment
+from .models import Patient, PatientPayment, TypeDisease, Region, Appointment
 from .serializers import PatientSerializer, PatientCreateSerializer, PatientDetailSerializer, PatientUpdateSerializer, \
-    PatientPaymentSerializer
+    PatientPaymentSerializer, RegionSerializer, TypeDiseaseSerializer
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import PageNumberPagination
@@ -22,6 +22,22 @@ class PatientPagination(PageNumberPagination):
     page_size = 10  # Har bir sahifada 10 ta bemor chiqadi
     page_size_query_param = 'page_size'  # Foydalanuvchi o‘zi sonni belgilashi mumkin
     max_page_size = 100  # Maksimal 100 ta bemor
+
+
+# Regionlar ro‘yxatini olish uchun API
+class RegionListAPIView(APIView):
+    def get(self, request):
+        regions = Region.objects.all()
+        serializer = RegionSerializer(regions, many=True)
+        return Response(serializer.data)
+
+
+# Kasallik turlari ro‘yxatini olish uchun API
+class TypeDiseaseListAPIView(APIView):
+    def get(self, request):
+        diseases = TypeDisease.objects.all()
+        serializer = TypeDiseaseSerializer(diseases, many=True)
+        return Response(serializer.data)
 
 
 class BasePatientListView(ListAPIView):
@@ -193,3 +209,34 @@ class PatientStatisticsView(APIView):
             "debtor": status_counts["debtor"],
             "paid": status_counts["paid"]
         })
+
+
+# ertaga kelishi kerak bolgan bemorlar royxati
+class TomorrowAppointmentsView(APIView):
+    """
+    ✅ Ertaga kelishi kerak bo‘lgan bemorlarning ro‘yxatini qaytaradi (uchrashuv vaqti ko‘rsatilmaydi).
+    """
+
+    def get(self, request):
+        tomorrow = now().date() + timedelta(days=1)  # Ertangi sana (faqat kun)
+
+        # Ertangi uchrashuvi bor bemorlarni olish
+        patients = Patient.objects.filter(appointments__appointment_time__date=tomorrow).distinct()
+
+        # JSON formatga o'tkazish
+        response_data = PatientSerializer(patients, many=True).data
+
+        return Response(response_data)
+
+
+class TomorrowAppointmentsCountView(APIView):
+    """
+    ✅ Ertaga kelishi kerak bo‘lgan bemorlarning umumiy sonini optimallashtirilgan tarzda qaytaradi.
+    """
+
+    def get(self, request):
+        tomorrow = now().date() + timedelta(days=1)  # Ertangi sana
+        patient_count = Appointment.objects.filter(appointment_time__date=tomorrow).values_list("patient",
+                                                                                                flat=True).distinct().count()
+
+        return Response({"tomorrow_patient_count": patient_count})

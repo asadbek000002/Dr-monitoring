@@ -1,10 +1,14 @@
 from django.urls import path
 from .views import PatientCreateView, PatientDetailView, TreatedPatientsListView, UnderTreatmentPatientsListView, \
     PatientDeleteView, PatientUpdateView, DebtorPatientsListView, AllPatientsListView, \
-    PatientPaymentCreateView, PatientPaymentDeleteView, UpdatePatientStatusView, PatientStatisticsView
+    PatientPaymentCreateView, PatientPaymentDeleteView, UpdatePatientStatusView, PatientStatisticsView, \
+    RegionListAPIView, TypeDiseaseListAPIView, TomorrowAppointmentsView, TomorrowAppointmentsCountView
 
 urlpatterns = [
     path('patients/statistics/', PatientStatisticsView.as_view(), name='patient-statistics'),
+
+    path('regions/', RegionListAPIView.as_view(), name='region-list'),
+    path('diseases/', TypeDiseaseListAPIView.as_view(), name='disease-list'),
 
     path('patients/create/', PatientCreateView.as_view(), name='patient-create'),
 
@@ -23,5 +27,8 @@ urlpatterns = [
     path('patients/<int:pk>/payments/<int:payment_id>/', PatientPaymentDeleteView.as_view(), name='delete-payment'),
 
     path('patients/<int:pk>/update-status/', UpdatePatientStatusView.as_view(), name='update-patient-status'),
+
+    path('tomorrow-appointments/', TomorrowAppointmentsView.as_view(), name='tomorrow-appointments'),
+    path('tomorrow-appointments-count/', TomorrowAppointmentsCountView.as_view(), name='tomorrow-appointments'),
 
 ]
