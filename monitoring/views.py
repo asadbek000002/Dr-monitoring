@@ -1,18 +1,21 @@
 from collections import defaultdict
+
 from django.utils.timezone import now, timedelta
 from django.db.models import Q, Count
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, DestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
-from django.shortcuts import get_object_or_404
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
+
 from .models import Patient, PatientPayment, TypeDisease, Region, Appointment
 from .serializers import PatientSerializer, PatientCreateSerializer, PatientDetailSerializer, PatientUpdateSerializer, \
     PatientPaymentSerializer, RegionSerializer, TypeDiseaseSerializer
-from rest_framework.filters import SearchFilter, OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
 
 
 class PatientPagination(PageNumberPagination):
@@ -26,6 +29,8 @@ class PatientPagination(PageNumberPagination):
 
 # Regionlar ro‘yxatini olish uchun API
 class RegionListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         regions = Region.objects.all()
         serializer = RegionSerializer(regions, many=True)
@@ -34,6 +39,8 @@ class RegionListAPIView(APIView):
 
 # Kasallik turlari ro‘yxatini olish uchun API
 class TypeDiseaseListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         diseases = TypeDisease.objects.all()
         serializer = TypeDiseaseSerializer(diseases, many=True)
@@ -44,6 +51,7 @@ class BasePatientListView(ListAPIView):
     """
     Bemorlarni status bo‘yicha filterlaydigan bazaviy klass
     """
+    permission_classes = [IsAuthenticated]
     serializer_class = PatientSerializer
     pagination_class = PatientPagination  # Pagination qo‘shildi
     filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
@@ -68,6 +76,7 @@ class BasePatientListView(ListAPIView):
 
 class AllPatientsListView(BasePatientListView):
     """Barcha bemorlarning ro‘yxati (status bo‘yicha ajratilmagan)"""
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Patient.objects.all().select_related('region', 'type_disease').prefetch_related('appointments')
@@ -75,6 +84,7 @@ class AllPatientsListView(BasePatientListView):
 
 class DebtorPatientsListView(BasePatientListView):
     """Qarzdor bemorlar ro‘yxati"""
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return self.get_status_queryset('debtor')
@@ -82,6 +92,7 @@ class DebtorPatientsListView(BasePatientListView):
 
 class UnderTreatmentPatientsListView(BasePatientListView):
     """Hozirda davolanayotgan bemorlar ro‘yxati"""
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return self.get_status_queryset('paid')
@@ -89,6 +100,7 @@ class UnderTreatmentPatientsListView(BasePatientListView):
 
 class TreatedPatientsListView(BasePatientListView):
     """Davolanib bo‘lgan bemorlar ro‘yxati"""
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return self.get_status_queryset('treated')
@@ -98,6 +110,7 @@ class PatientCreateView(APIView):
     """
     Bemor yaratish API
     """
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = PatientCreateSerializer(data=request.data)
@@ -111,6 +124,7 @@ class PatientUpdateView(APIView):
     """
     Bemorni yangilash API
     """
+    permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
         patient = get_object_or_404(Patient, pk=pk)
@@ -138,6 +152,8 @@ class PatientDetailView(APIView):
     Bemorning batafsil ma’lumotlarini qaytaruvchi API
     """
 
+    # permission_classes = [IsAuthenticated]
+
     def get(self, request, pk):
         patient = get_object_or_404(
             Patient.objects.prefetch_related('appointments', 'payments').select_related('region', 'type_disease'), pk=pk
@@ -152,6 +168,8 @@ class PatientPaymentCreateView(CreateAPIView):
     """
     serializer_class = PatientPaymentSerializer
 
+    # permission_classes = [IsAuthenticated]
+
     def perform_create(self, serializer):
         patient_id = self.kwargs.get("pk")  # URL orqali patient_id ni olish
         patient = get_object_or_404(Patient, pk=patient_id)  # Agar topilmasa, 404 qaytarish
@@ -164,6 +182,7 @@ class PatientPaymentDeleteView(DestroyAPIView):
     Bemor tomonidan amalga oshirilgan to‘lovni o‘chirish API
     Faqat admin yoki tegishli xodimlar foydalanishi mumkin
     """
+    # permission_classes = [IsAuthenticated]
     queryset = PatientPayment.objects.all()
     serializer_class = PatientPaymentSerializer
 
@@ -183,6 +202,8 @@ class UpdatePatientStatusView(APIView):
     Faqat to‘liq to‘lagan bemorlar uchun ishlaydi
     """
 
+    # permission_classes = [IsAuthenticated]
+
     def patch(self, request, pk):
         patient = get_object_or_404(Patient, pk=pk)
 
@@ -197,6 +218,8 @@ class UpdatePatientStatusView(APIView):
 
 
 class PatientStatisticsView(APIView):
+    # permission_classes = [IsAuthenticated]
+
     def get(self, request):
         total_patients = Patient.objects.count()
 
@@ -217,6 +240,8 @@ class TomorrowAppointmentsView(APIView):
     ✅ Ertaga kelishi kerak bo‘lgan bemorlarning ro‘yxatini qaytaradi (uchrashuv vaqti ko‘rsatilmaydi).
     """
 
+    # permission_classes = [IsAuthenticated]
+
     def get(self, request):
         tomorrow = now().date() + timedelta(days=1)  # Ertangi sana (faqat kun)
 
@@ -224,7 +249,7 @@ class TomorrowAppointmentsView(APIView):
         patients = Patient.objects.filter(appointments__appointment_time__date=tomorrow).distinct()
 
         # JSON formatga o'tkazish
-        response_data = PatientSerializer(patients, many=True).data
+        response_data = PatientSerializer(patients, many=True, context={'request': request}).data
 
         return Response(response_data)
 
@@ -233,6 +258,8 @@ class TomorrowAppointmentsCountView(APIView):
     """
     ✅ Ertaga kelishi kerak bo‘lgan bemorlarning umumiy sonini optimallashtirilgan tarzda qaytaradi.
     """
+
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request):
         tomorrow = now().date() + timedelta(days=1)  # Ertangi sana
