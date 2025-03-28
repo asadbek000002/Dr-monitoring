@@ -174,10 +174,11 @@ CORS_ALLOW_ALL_ORIGINS = True  # Tavsiya etilmaydi
 
 
 # CSRF sozlamalari
-CSRF_TRUSTED_ORIGINS = [
-    "http://dilshodakosmetolog.uz",
-    "https://dilshodakosmetolog.uz",
-]
+# CSRF_TRUSTED_ORIGINS = [
+#     "http://localhost:5174",
+#     "http://dilshodakosmetolog.uz",
+#     "https://dilshodakosmetolog.uz",
+# ]
 
 CSRF_COOKIE_SECURE = True  # HTTPS orqali xavfsiz cookie'larni ishlatish
 CSRF_USE_SESSIONS = True  # CSRF tokenni sessiya orqali saqlash
