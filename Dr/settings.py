@@ -160,9 +160,10 @@ SIMPLE_JWT = {
 }
 
 AUTH_USER_MODEL = 'employee.User'  # yourapp ni loyihangiz nomiga almashtiring
-
+CORS_ALLOW_CREDENTIALS = True
 # CORS Ruxsatlar
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5174",
     "http://dilshodakosmetolog.uz",
     "https://dilshodakosmetolog.uz",
 ]
@@ -173,12 +174,14 @@ CORS_ALLOW_ALL_ORIGINS = True  # Tavsiya etilmaydi
 # CORS_ALLOW_CREDENTIALS = True  # Cookie va auth tokenlarni ishlatish uchun
 
 
+
+
 # CSRF sozlamalari
-# CSRF_TRUSTED_ORIGINS = [
-#     "http://localhost:5174",
-#     "http://dilshodakosmetolog.uz",
-#     "https://dilshodakosmetolog.uz",
-# ]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5174",
+    "http://dilshodakosmetolog.uz",
+    "https://dilshodakosmetolog.uz",
+]
 
 CSRF_COOKIE_SECURE = True  # HTTPS orqali xavfsiz cookie'larni ishlatish
 CSRF_USE_SESSIONS = True  # CSRF tokenni sessiya orqali saqlash
