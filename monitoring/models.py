@@ -27,12 +27,12 @@ class Patient(models.Model):
     full_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=20)
     region = models.ForeignKey(Region, on_delete=models.CASCADE)
-    address = models.TextField()
+    address = models.TextField( blank=True, null=True)
     photo = models.ImageField(upload_to='patients/photos/', blank=True, null=True)
     type_disease = models.ForeignKey(TypeDisease, on_delete=models.CASCADE, related_name='appointments')
-    face_condition = models.TextField()
-    medications_taken = models.TextField()
-    home_care_items = models.TextField()
+    face_condition = models.TextField(blank=True, null=True)
+    medications_taken = models.TextField( blank=True, null=True)
+    home_care_items = models.TextField( blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='debtor')
 
     total_payment_due = models.DecimalField(max_digits=10, decimal_places=2,

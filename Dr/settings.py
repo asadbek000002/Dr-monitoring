@@ -81,23 +81,23 @@ WSGI_APPLICATION = 'Dr.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "dr",  # Bazaning nomi (compose fayldagi POSTGRES_DB)
-        "USER": "user_dr",  # Foydalanuvchi (compose fayldagi POSTGRES_USER)
-        "PASSWORD": "password_dr",  # Parol (compose fayldagi POSTGRES_PASSWORD)
-        "HOST": "dr_db",  # Docker compose ichidagi servis nomi
-        "PORT": "5432",  # PostgreSQL standarti port
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "dr",  # Bazaning nomi (compose fayldagi POSTGRES_DB)
+#         "USER": "user_dr",  # Foydalanuvchi (compose fayldagi POSTGRES_USER)
+#         "PASSWORD": "password_dr",  # Parol (compose fayldagi POSTGRES_PASSWORD)
+#         "HOST": "dr_db",  # Docker compose ichidagi servis nomi
+#         "PORT": "5432",  # PostgreSQL standarti port
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
