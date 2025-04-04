@@ -36,15 +36,16 @@ class PatientSerializer(serializers.ModelSerializer):
 
 # User malumotlarini yaratish
 class PatientCreateSerializer(serializers.ModelSerializer):
-    appointments = AppointmentSerializer(many=True, required=False)
-    remove = serializers.ListField(child=serializers.IntegerField(), required=False, write_only=True)
+    appointments = AppointmentSerializer(many=True, required=True)
+
+    # remove = serializers.ListField(child=serializers.IntegerField(), required=False, write_only=True)
 
     class Meta:
         model = Patient
         fields = [
             'id', 'full_name', 'phone_number', 'region', 'address', 'photo',
             'type_disease', 'face_condition', 'medications_taken',
-            'home_care_items', 'total_payment_due', 'status', 'appointments', 'remove', 'created_at'
+            'home_care_items', 'total_payment_due', 'status', 'appointments', 'created_at'
         ]
 
     def create(self, validated_data):

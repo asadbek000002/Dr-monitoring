@@ -79,7 +79,7 @@ class AllPatientsListView(BasePatientListView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Patient.objects.all().select_related('region', 'type_disease').prefetch_related('appointments')
+        return Patient.objects.all().select_related('region', 'type_disease').prefetch_related('appointments').order_by('-created_at')
 
 
 class DebtorPatientsListView(BasePatientListView):
@@ -87,7 +87,7 @@ class DebtorPatientsListView(BasePatientListView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return self.get_status_queryset('debtor')
+        return self.get_status_queryset('debtor').order_by('-created_at')
 
 
 class UnderTreatmentPatientsListView(BasePatientListView):
@@ -95,7 +95,7 @@ class UnderTreatmentPatientsListView(BasePatientListView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return self.get_status_queryset('paid')
+        return self.get_status_queryset('paid').order_by('-created_at')
 
 
 class TreatedPatientsListView(BasePatientListView):
@@ -103,7 +103,7 @@ class TreatedPatientsListView(BasePatientListView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return self.get_status_queryset('treated')
+        return self.get_status_queryset('treated').order_by('-created_at')
 
 
 class PatientCreateView(APIView):
