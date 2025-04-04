@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Patient, Appointment, Region, TypeDisease, PatientPayment
+from drf_extra_fields.fields import Base64ImageField
 
 
 # USer ni qaysi viloyatda ekanini aniqlovchi malumot
@@ -36,6 +37,7 @@ class PatientSerializer(serializers.ModelSerializer):
 
 # User malumotlarini yaratish
 class PatientCreateSerializer(serializers.ModelSerializer):
+    photo = Base64ImageField(required=False)
     appointments = AppointmentSerializer(many=True, required=True)
 
     # remove = serializers.ListField(child=serializers.IntegerField(), required=False, write_only=True)
@@ -74,6 +76,7 @@ class PatientCreateSerializer(serializers.ModelSerializer):
 
 # User malumotlarini tahrirlash
 class PatientUpdateSerializer(serializers.ModelSerializer):
+    photo = Base64ImageField(required=False)
     appointments = AppointmentSerializer(many=True, required=False, read_only=True)  # Faqat o‘qish uchun
     remove = serializers.ListField(child=serializers.IntegerField(), required=False,
                                    write_only=True)  # O‘chiriladiganlar
