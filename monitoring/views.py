@@ -224,10 +224,10 @@ class PatientStatisticsView(APIView):
     # permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        total_patients = Patient.objects.count()
+        total_patients = Patient.active_patients().count()
 
         # Default qiymatlar bilan status hisoblash
-        status_counts = defaultdict(int, dict(Patient.objects.values_list('status').annotate(Count('id'))))
+        status_counts = defaultdict(int, dict(Patient.active_patients().values_list('status').annotate(Count('id'))))
 
         return Response({
             "total_patients": total_patients,
