@@ -42,7 +42,7 @@ class Patient(models.Model):
     is_deleted = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.full_name
+        return self.full_name if self.full_name else "Nomalum"
 
     @property
     def total_paid(self):
@@ -79,7 +79,9 @@ class Appointment(models.Model):
     appointment_time = models.DateTimeField()
 
     def __str__(self):
-        return f"{self.patient.full_name} - {self.appointment_time}"
+        full_name = self.patient.full_name if self.patient and self.patient.full_name else "Nomalum"
+        appointment_time = self.appointment_time if self.appointment_time else "Nomalum"
+        return f"{full_name} - {appointment_time}"
 
 
 class PatientPayment(models.Model):
@@ -92,7 +94,10 @@ class PatientPayment(models.Model):
     payment_date = models.DateTimeField(auto_now_add=True)  # To‘lov sanasi
 
     def __str__(self):
-        return f"{self.patient.full_name} - {self.amount} so‘m ({self.payment_date})"
+        full_name = self.patient.full_name if self.patient and self.patient.full_name else "Nomalum"
+        amount = f"{self.amount} so‘m" if self.amount else "Nomalum"
+        payment_date = self.payment_date.strftime("%Y-%m-%d") if self.payment_date else "Nomalum"
+        return f"{full_name} - {amount} ({payment_date})"
 
     def save(self, *args, **kwargs):
         """To‘lov kiritilganda bemorning qarzini va statusini yangilash"""
