@@ -150,21 +150,3 @@ class PatientDetailSerializer(serializers.ModelSerializer):
         """Foydalanuvchi admin ekanligini tekshirish"""
         request = self.context.get('request', None)
         return request.user.is_superuser if request else False
-
-# class PatientDetailSerializer(serializers.ModelSerializer):
-#     region = RegionSerializer()
-#     type_disease = TypeDiseaseSerializer()
-#     appointments = AppointmentSerializer(many=True, required=False)
-#     is_superuser = serializers.SerializerMethodField()
-#
-#     class Meta:
-#         model = Patient
-#         fields = [
-#             'id', 'full_name', 'phone_number', 'region', 'address', 'photo',
-#             'type_disease', 'face_condition', 'medications_taken', 'home_care_items', 'status', 'appointments',
-#             'is_superuser'
-#         ]
-#
-#     def get_is_superuser(self, obj):
-#         request = self.context.get('request', None)
-#         return request.user.is_superuser if request else False

@@ -26,18 +26,20 @@ class Patient(models.Model):
 
     full_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=20)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE)
-    address = models.TextField( blank=True, null=True)
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
+    address = models.TextField(blank=True, null=True)
     photo = models.ImageField(upload_to='patients/photos/', blank=True, null=True)
-    type_disease = models.ForeignKey(TypeDisease, on_delete=models.CASCADE, related_name='appointments')
+    type_disease = models.ForeignKey(TypeDisease, on_delete=models.SET_NULL, null=True, related_name='appointments')
     face_condition = models.TextField(blank=True, null=True)
-    medications_taken = models.TextField( blank=True, null=True)
-    home_care_items = models.TextField( blank=True, null=True)
+    medications_taken = models.TextField(blank=True, null=True)
+    home_care_items = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='debtor')
-
     total_payment_due = models.DecimalField(max_digits=10, decimal_places=2,
                                             default=0.00)  # Umumiy to‘lanishi kerak bo‘lgan summa
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # Soft delete maydoni
+    is_deleted = models.BooleanField(default=False)
 
     def __str__(self):
         return self.full_name
@@ -61,9 +63,19 @@ class Patient(models.Model):
             self.status = 'debtor'
         self.save()
 
+    def delete(self, *args, **kwargs):
+        """Soft delete: faqat `is_deleted` ni True qilish"""
+        self.is_deleted = True
+        self.save()
+
+    @classmethod
+    def active_patients(cls):
+        """Faol bemorlarni qaytarish"""
+        return cls.objects.filter(is_deleted=False)
+
 
 class Appointment(models.Model):
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='appointments')
+    patient = models.ForeignKey(Patient, on_delete=models.SET_NULL, null=True, related_name='appointments')
     appointment_time = models.DateTimeField()
 
     def __str__(self):
@@ -74,7 +86,8 @@ class PatientPayment(models.Model):
     """
     Bemor tomonidan amalga oshirilgan to‘lovlar tarixi
     """
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='payments')
+    # patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='payments')
+    patient = models.ForeignKey(Patient, on_delete=models.SET_NULL, null=True, related_name='payments')
     amount = models.DecimalField(max_digits=10, decimal_places=2)  # To‘lov summasi
     payment_date = models.DateTimeField(auto_now_add=True)  # To‘lov sanasi
 

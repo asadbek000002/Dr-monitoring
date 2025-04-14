@@ -62,7 +62,8 @@ class BasePatientListView(ListAPIView):
         """
         Statusga qarab filterlaydigan umumiy metod
         """
-        queryset = Patient.objects.filter(status=status).select_related('region', 'type_disease').prefetch_related(
+        queryset = Patient.active_patients().filter(status=status).select_related('region',
+                                                                                  'type_disease').prefetch_related(
             'appointments')
         search_query = self.request.query_params.get("search", None)
 
@@ -79,7 +80,8 @@ class AllPatientsListView(BasePatientListView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Patient.objects.all().select_related('region', 'type_disease').prefetch_related('appointments').order_by('-created_at')
+        return Patient.active_patients().select_related('region', 'type_disease').prefetch_related(
+            'appointments').order_by('-created_at')
 
 
 class DebtorPatientsListView(BasePatientListView):
@@ -127,7 +129,7 @@ class PatientUpdateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
-        patient = get_object_or_404(Patient, pk=pk)
+        patient = get_object_or_404(Patient.active_patients(), pk=pk)
         serializer = PatientUpdateSerializer(patient, data=request.data, partial=True)
         if serializer.is_valid():
             patient = serializer.save()
@@ -156,7 +158,8 @@ class PatientDetailView(APIView):
 
     def get(self, request, pk):
         patient = get_object_or_404(
-            Patient.objects.prefetch_related('appointments', 'payments').select_related('region', 'type_disease'), pk=pk
+            Patient.active_patients().prefetch_related('appointments', 'payments').select_related('region',
+                                                                                                  'type_disease'), pk=pk
         )
         serializer = PatientDetailSerializer(patient, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -172,7 +175,7 @@ class PatientPaymentCreateView(CreateAPIView):
 
     def perform_create(self, serializer):
         patient_id = self.kwargs.get("pk")  # URL orqali patient_id ni olish
-        patient = get_object_or_404(Patient, pk=patient_id)  # Agar topilmasa, 404 qaytarish
+        patient = get_object_or_404(Patient.active_patients(), pk=patient_id)  # Agar topilmasa, 404 qaytarish
         serializer.save(patient=patient)  # To‘lovga bemorni qo‘shish
         patient.update_status()  # Qarzni yangilash
 
@@ -205,7 +208,7 @@ class UpdatePatientStatusView(APIView):
     # permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk):
-        patient = get_object_or_404(Patient, pk=pk)
+        patient = get_object_or_404(Patient.active_patients(), pk=pk)
 
         if patient.status == 'paid':
             patient.status = 'treated'
@@ -246,7 +249,7 @@ class TomorrowAppointmentsView(APIView):
         tomorrow = now().date() + timedelta(days=1)  # Ertangi sana (faqat kun)
 
         # Ertangi uchrashuvi bor bemorlarni olish
-        patients = Patient.objects.filter(appointments__appointment_time__date=tomorrow).distinct()
+        patients = Patient.active_patients().filter(appointments__appointment_time__date=tomorrow).distinct()
 
         # JSON formatga o'tkazish
         response_data = PatientSerializer(patients, many=True, context={'request': request}).data
@@ -263,7 +266,8 @@ class TomorrowAppointmentsCountView(APIView):
 
     def get(self, request):
         tomorrow = now().date() + timedelta(days=1)  # Ertangi sana
-        patient_count = Appointment.objects.filter(appointment_time__date=tomorrow).values_list("patient",
-                                                                                                flat=True).distinct().count()
+        patient_count = Appointment.objects.filter(appointment_time__date=tomorrow,
+                                                   patient__is_deleted=False).values_list("patient",
+                                                                                          flat=True).distinct().count()
 
         return Response({"tomorrow_patient_count": patient_count})

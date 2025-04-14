@@ -7,7 +7,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import update_last_login
 from django.contrib.auth import get_user_model
 
+from rest_framework.permissions import IsAuthenticated
+from .serializers import UserSimpleSerializer
+
 User = get_user_model()
+
 
 # Login API (username orqali)
 class LoginView(APIView):
@@ -39,3 +43,13 @@ class LogoutView(APIView):
             return Response({"message": "Logout muvaffaqiyatli!"}, status=status.HTTP_205_RESET_CONTENT)
         except Exception:
             return Response({"error": "Noto‘g‘ri token!"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # faqat autentifikatsiyalangan foydalanuvchining ma'lumotlarini olish
+        user = request.user
+        serializer = UserSimpleSerializer(user)
+        return Response(serializer.data)
