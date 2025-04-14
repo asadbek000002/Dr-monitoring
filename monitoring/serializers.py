@@ -88,7 +88,7 @@ class PatientUpdateSerializer(serializers.ModelSerializer):
         fields = [
             'full_name', 'phone_number', 'region', 'address', 'photo',
             'type_disease', 'face_condition', 'medications_taken',
-            'home_care_items', 'status', 'appointments', 'remove', 'new_appointments'
+            'home_care_items', 'status', 'appointments', 'remove', 'new_appointments', 'total_payment_due'
         ]
 
     def update(self, instance, validated_data):
