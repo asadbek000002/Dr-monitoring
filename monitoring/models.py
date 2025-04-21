@@ -34,7 +34,7 @@ class Patient(models.Model):
     medications_taken = models.TextField(blank=True, null=True)
     home_care_items = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='debtor')
-    total_payment_due = models.DecimalField(max_digits=10, decimal_places=2,
+    total_payment_due = models.DecimalField(max_digits=50, decimal_places=2,
                                             default=0.00)  # Umumiy to‘lanishi kerak bo‘lgan summa
     created_at = models.DateTimeField(auto_now_add=True)
 
